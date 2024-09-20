@@ -1,4 +1,4 @@
-const registry = require('@beyond-js/widgets-bundle/registry');
+const registry = require('@beyond-js/bundles-sdk/registry');
 /**
  * Package initialisation
  *
@@ -8,7 +8,7 @@ const registry = require('@beyond-js/widgets-bundle/registry');
  */
 module.exports = function (packager, hmr) {
 	const { bundle } = packager;
-	const transversal = !!registry.bundles.get(bundle.type).transversal;
+	const transversal = !!bundle.transversal;
 
 	if (!hmr && transversal) {
 		const imports = [...packager.dependencies.code.keys()]

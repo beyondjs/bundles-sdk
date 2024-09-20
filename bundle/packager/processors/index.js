@@ -1,5 +1,4 @@
 const registry = require('@beyond-js/budles-sdk/registry');
-const registry = require('@beyond-js/widgets-bundle/registry');
 const ProcessorBase = require('@beyond-js/processor/base');
 
 /**
@@ -49,7 +48,7 @@ module.exports = class extends DynamicProcessor {
 
 		this.#packager = packager;
 		const { bundle } = packager;
-		this.#supported = registry.bundles.get(bundle.type).bundle.processors;
+		this.#supported = bundle.processors;
 		if (!(this.#supported instanceof Array)) {
 			throw new Error(`Supported processors property is not defined in "${bundle.type}" bundle`);
 		}

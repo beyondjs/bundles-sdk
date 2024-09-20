@@ -1,44 +1,44 @@
-const {EventEmitter} = require('events');
+const { EventEmitter } = require('events');
 
 module.exports = class extends EventEmitter {
-    #bundle;
-    #packagers = new Map();
-    #propagator;
+	#bundle;
+	#packagers = new Map();
+	#propagator;
 
-    constructor(bundle) {
-        super();
-        this.#bundle = bundle;
-        this.#propagator = new (require('./propagator'))(this);
-    }
+	#destroyed = false;
+	get destroyed() {
+		return this.#destroyed;
+	}
 
-    get(distribution, language) {
-        language = language ? language : '.';
-        const key = `${distribution.key}//${language}`;
-        if (this.#packagers.has(key)) return this.#packagers.get(key);
+	constructor(bundle) {
+		super();
+		this.#bundle = bundle;
+		this.#propagator = new (require('./propagator'))(this);
+	}
 
-        const {meta} = this.#bundle;
-        const Packager = meta.bundle?.Packager ? meta.bundle.Packager : require('./packager');
-        const packager = new Packager(this.#bundle, distribution, language);
-        this.#propagator.subscribe(packager);
-        this.#packagers.set(key, packager);
-        return packager;
-    }
+	get(distribution, language) {
+		language = language ? language : '.';
+		const key = `${distribution.key}//${language}`;
+		if (this.#packagers.has(key)) return this.#packagers.get(key);
 
-    #destroyed = false;
-    get destroyed() {
-        return this.#destroyed;
-    }
+		const { meta } = this.#bundle;
+		const Packager = meta.bundle?.Packager ? meta.bundle.Packager : require('./packager');
+		const packager = new Packager(this.#bundle, distribution, language);
+		this.#propagator.subscribe(packager);
+		this.#packagers.set(key, packager);
+		return packager;
+	}
 
-    #clear = () => {
-        this.#packagers.forEach(packager => {
-            this.#propagator.unsubscribe(packager);
-            packager.destroy();
-        });
-    }
+	#clear = () => {
+		this.#packagers.forEach(packager => {
+			this.#propagator.unsubscribe(packager);
+			packager.destroy();
+		});
+	};
 
-    destroy() {
-        if (this.#destroyed) throw new Error('Object already destroyed');
-        this.#destroyed = true;
-        this.#clear();
-    }
-}
+	destroy() {
+		if (this.#destroyed) throw new Error('Object already destroyed');
+		this.#destroyed = true;
+		this.#clear();
+	}
+};

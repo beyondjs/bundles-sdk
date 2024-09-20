@@ -1,5 +1,8 @@
 const ipc = require('@beyond-js/ipc');
 const DynamicProcessor = require('@beyond-js/dynamic-processor')(Map);
+const DefaultDependency = require('@beyond-js/bundles-sdk/dependencies/dependency');
+const DependencyCode = require('@beyond-js/bundles-sdk/dependencies/code');
+const DefaultPropagator = require('@beyond-js/bundles-sdk/dependencies/propagator');
 
 module.exports = class extends DynamicProcessor {
 	get dp() {
@@ -65,9 +68,9 @@ module.exports = class extends DynamicProcessor {
 	constructor(bp, Dependency, Propagator) {
 		super();
 		this.#bp = bp;
-		this.#Dependency = Dependency ? Dependency : require('../../../dependencies/dependency');
+		this.#Dependency = Dependency ? Dependency : DefaultDependency;
 		this.#hash = new (require('./hash'))(this);
-		this.#code = new (require('../../../dependencies/code'))(this, bp);
+		this.#code = new DependencyCode(this, bp);
 		this.#added = new (require('./added'))(this);
 
 		super.setup(
@@ -77,12 +80,13 @@ module.exports = class extends DynamicProcessor {
 			]),
 		);
 
-		Propagator = Propagator ? Propagator : require('../../../dependencies/propagator');
+		Propagator = Propagator ? Propagator : DefaultPropagator;
 		this.#propagator = new Propagator(this._events);
 	}
 
 	_prepared() {
 		// All bundles depends on @beyond-js/kernel/bundle, except itself
+		//todo: review it
 		this.bp.bundle.specifier !== '@beyond-js/kernel/bundle' && this.#added.add('@beyond-js/kernel/bundle');
 	}
 

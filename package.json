@@ -8,6 +8,7 @@
 		".": "./index.js",
 		"./dependencies/dependency": "./dependencies/dependency.js",
 		"./dependencies/propagator": "./dependencies/propagator.js",
+		"./dependencies/code": "./dependencies/index.js",
 		"./bundle": "./bundle/index.js",
 		"./bundle/packager": "./bundle/packager.js",
 		"./bundle/packager/code/base": "./bundle/packager/code/base.js",
