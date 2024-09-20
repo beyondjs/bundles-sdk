@@ -1,6 +1,5 @@
 const DynamicProcessor = require('@beyond-js/dynamic-processor')();
 const equal = require('@beyond-js/equal');
-const registry = require('@beyond-js/bundles-sdk/registry');
 
 module.exports = class extends DynamicProcessor {
 	get dp() {
@@ -96,6 +95,10 @@ module.exports = class extends DynamicProcessor {
 
 	get vspecifier() {
 		return this.#config?.vspecifier;
+	}
+
+	get settings() {
+		return this.#module.application.bundles.get(this.type)?.settings;
 	}
 
 	resource(distribution) {

@@ -1,5 +1,5 @@
 const DynamicProcessor = require('@beyond-js/dynamic-processor')();
-const registry = require('@beyond-js/bundles-sdk/registry');
+
 /**
  * Bundler abstract class
  */
@@ -89,7 +89,7 @@ module.exports = class extends DynamicProcessor {
 		this.#language = language;
 
 		super.setup(new Map([['bundle', { child: bundle }]]));
-
+		
 		this.#processors = new (require('./processors'))(this);
 		this.#dependencies = new (require('./dependencies'))(this);
 		this.#hash = new (require('./hash'))(this);

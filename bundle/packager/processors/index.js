@@ -48,7 +48,8 @@ module.exports = class extends DynamicProcessor {
 
 		this.#packager = packager;
 		const { bundle } = packager;
-		this.#supported = bundle.processors;
+		const processors = bundle.settings?.processors;
+		this.#supported = processors;
 		if (!(this.#supported instanceof Array)) {
 			throw new Error(`Supported processors property is not defined in "${bundle.type}" bundle`);
 		}
@@ -59,13 +60,14 @@ module.exports = class extends DynamicProcessor {
 		super.setup(
 			new Map([
 				['bundle', { child: bundle }],
-				['registry.processors', { child: registry.processors }],
+				['registry.processors', { child: processors }],
 			]),
 		);
 	}
 
 	_process() {
-		let { valid, config } = this.#packager.bundle;
+		const { bundle } = this.#packager;
+		let { valid, config } = bundle;
 		config = valid && config ? config : {};
 
 		const { multilanguage } = config;
