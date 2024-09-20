@@ -1,4 +1,3 @@
-const registry = require('@beyond-js/budles-sdk/registry');
 const ProcessorBase = require('@beyond-js/processor/base');
 
 /**
@@ -22,6 +21,7 @@ module.exports = class extends DynamicProcessor {
 	// The names of the processors supported by the bundler
 	#supported;
 	#propagator;
+	#settings;
 
 	#hashes;
 	get hashes() {
@@ -56,11 +56,14 @@ module.exports = class extends DynamicProcessor {
 		this.#propagator = new (require('./propagator'))(this._events);
 		this.#hashes = new (require('./hashes'))(this);
 
+		const { settings } = bundle.application.bundles.get(bundle.name);
+		this.#settings = settings;
+
 		super.setup(
 			new Map([
 				['bundle', { child: bundle }],
-				['registry.processors', { child: registry.processors }],
-			]),
+				['settings', { child: settings }],
+			])
 		);
 	}
 
@@ -78,7 +81,7 @@ module.exports = class extends DynamicProcessor {
 		for (const [name, config] of processors) {
 			if (reserved.includes(name)) continue;
 
-			if (this.#supported.includes(name) && !registry.processors.has(name)) {
+			if (this.#supported.includes(name) && !this.#settings.value.processors?.has(name)) {
 				this.#errors.push(`Processor "${name}" is not registered`);
 				continue;
 			}

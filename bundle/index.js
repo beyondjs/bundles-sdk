@@ -160,7 +160,7 @@ module.exports = class extends DynamicProcessor {
 		if (!module || !type) throw new Error('Invalid parameters');
 
 		super();
-		this.#meta = meta; // registry.bundles.get(type);
+		this.#meta = meta;
 		this.#module = module;
 		this.#type = type;
 		this.#packagers = new (require('./packagers'))(this);
@@ -170,7 +170,7 @@ module.exports = class extends DynamicProcessor {
 			new Map([
 				['module', { child: module }],
 				['config', { child: config }],
-			]),
+			])
 		);
 	}
 

@@ -84,7 +84,7 @@ module.exports = class extends DynamicProcessor {
 		if (this.external) return 'external';
 
 		const { bundle } = this.seeker;
-		const transversal = !!registry.bundles.get(bundle.type).transversal;
+		const transversal = bundle.config.transversal;
 		return transversal ? 'transversal' : 'bundle';
 	}
 
