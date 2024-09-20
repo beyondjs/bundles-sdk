@@ -1,4 +1,6 @@
 const ProcessorBase = require('@beyond-js/processor/base');
+const DynamicProcessor = require('@beyond-js/dynamic-processor')();
+const ProcessorsSettings = require('./settings');
 
 /**
  * The processors of a packager
@@ -19,9 +21,9 @@ module.exports = class extends DynamicProcessor {
 	}
 
 	// The names of the processors supported by the bundler
-	#supported;
-	#propagator;
 	#settings;
+
+	#propagator;
 
 	#hashes;
 	get hashes() {
@@ -48,17 +50,11 @@ module.exports = class extends DynamicProcessor {
 
 		this.#packager = packager;
 		const { bundle } = packager;
-		const processors = bundle.settings?.processors;
-		this.#supported = processors;
-		if (!(this.#supported instanceof Array)) {
-			throw new Error(`Supported processors property is not defined in "${bundle.type}" bundle`);
-		}
 
 		this.#propagator = new (require('./propagator'))(this._events);
 		this.#hashes = new (require('./hashes'))(this);
 
-		const { settings } = bundle.application.bundles.get(bundle.name);
-		this.#settings = settings;
+		const settings = (this.#settings = new ProcessorsSettings(bundle.settings));
 
 		super.setup(
 			new Map([
@@ -83,11 +79,12 @@ module.exports = class extends DynamicProcessor {
 		for (const [name, config] of processors) {
 			if (reserved.includes(name)) continue;
 
-			if (this.#supported.includes(name) && !this.#settings.value.processors?.has(name)) {
+			const settings = this.#settings;
+			if (settings.includes(name) && !settings.value.processors?.has(name)) {
 				this.#errors.push(`Processor "${name}" is not registered`);
 				continue;
 			}
-			if (!this.#supported.includes(name)) {
+			if (!settings.includes(name)) {
 				this.#warnings.push(`Configuration property "${name}" is not supported by the bundle`);
 				continue;
 			}
@@ -100,7 +97,7 @@ module.exports = class extends DynamicProcessor {
 			const packager = this.#packager;
 			const specs = { watcher, bundle, packager, distribution, language, application };
 
-			const meta = registry.processors.get(name);
+			const meta = settings.get(name);
 			const Processor = meta.Processor ? meta.Processor : ProcessorBase;
 			const processor = this.has(name) ? this.get(name) : (changed = true) && new Processor(name, specs);
 
